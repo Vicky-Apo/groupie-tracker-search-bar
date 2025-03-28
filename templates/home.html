@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groupie Tracker - Artists</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header>
+    <h1 class="title">Explore Legendary Artists</h1>
+    <nav>
+      <a class="nav-link" href="/">Home</a>
+      <a class="nav-link" href="/about">About</a>
+    </nav>
+  </header>
+  
+  <main>
+    <div class="search-bar-container">
+      <div class="search-select-wrapper">
+        <select id="searchFilter">
+          <option value="all">All</option>
+          <option value="artist">Artist</option>
+          <option value="member">Member</option>
+          <option value="location">Location</option>
+          <option value="album">First Album</option>
+          <option value="date">Creation Date</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Search..." autocomplete="on">
+      </div>
+      <ul id="suggestions" class="suggestion-box"></ul>
+    </div>      
+    <div class="artist-container" id="artistList">
+      {{range .}}
+      <div class="artist-card">
+        <!-- Using a template function (replaceSpaces) to convert spaces to dashes -->
+        <a href="/artist/{{.Name | replaceSpaces}}">
+          <img src="{{.Image}}" alt="{{.Name}}" class="artist-img" />
+          <h3>{{.Name}}</h3>
+        </a>
+      </div>
+      {{end}}
+    </div>
+    <div class="load-more-section">
+      <button id="loadMoreBtn" class="interactive-btn">Load More</button>  
+    </div>
+  </main>
+  
+  <footer>
+    <p>&copy; 2025 Groupie Trackers | Made with 💙 for Music Lovers</p>
+  </footer>
+  
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

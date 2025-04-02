@@ -11,6 +11,29 @@ import (
 	"strings"
 )
 
+func IndexPageHandler(tpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if len(data.AllArtists) == 0 {
+			log.Println("ERROR: No artist data available")
+			http.Error(w, "No artist data available", http.StatusInternalServerError)
+			return
+		}
+
+		sortedArtists := make([]data.Artist, len(data.AllArtists))
+		copy(sortedArtists, data.AllArtists)
+
+		sort.Slice(sortedArtists, func(i, j int) bool {
+			return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
+		})
+
+		err := tpl.ExecuteTemplate(w, "home.html", sortedArtists)
+		if err != nil {
+			log.Println("ERROR rendering template:", err)
+			http.Error(w, "Internal Server Error while rendering homepage", http.StatusInternalServerError)
+		}
+	}
+}
+
 // HomeHandler handles the "/" route and renders the home page.
 func HomeHandler(tpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -37,17 +60,7 @@ func HomeHandler(tpl *template.Template) http.HandlerFunc {
 			return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
 		})
 
-		// Only pass the initial 10 artists.
-		initialCount := 10
-		var initialArtists []data.Artist
-		if len(sortedArtists) > initialCount {
-			initialArtists = sortedArtists[:initialCount]
-		} else {
-			initialArtists = sortedArtists
-		}
-
-		// Render the homepage template with initialArtists.
-		err := tpl.ExecuteTemplate(w, "home.html", initialArtists)
+		err := tpl.ExecuteTemplate(w, "home.html", sortedArtists)
 		if err != nil {
 			log.Println("ERROR rendering template:", err)
 			http.Error(w, "Internal Server Error while rendering index", http.StatusInternalServerError)
@@ -111,7 +124,13 @@ func GetArtists(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paginatedArtists := sortedArtists[offset:end]
-	err := json.NewEncoder(w).Encode(paginatedArtists)
+
+	response := map[string]interface{}{
+		"artists": paginatedArtists,
+		"total":   len(sortedArtists),
+	}
+
+	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		log.Println("ERROR encoding JSON:", err)
 		http.Error(w, "Internal Server Error while encoding JSON", http.StatusInternalServerError)

@@ -5,43 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Groupie Tracker - Artists</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/search.css" />
+
 </head>
-<body>
+<body class="default-page">
+
   <header>
+    <div class="title-box">
     <h1 class="title">Explore Legendary Artists</h1>
+  </div>
     <nav>
-      <a class="nav-link" href="/">Home</a>
-      <a class="nav-link" href="/about">About</a>
-    </nav>
+      <a href="/home" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+    </nav>    
   </header>
   
   <main>
     <div class="search-bar-container">
-      <input type="text" id="searchInput" placeholder="Search..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="Search..." autocomplete="on" />
       <ul id="suggestions" class="suggestion-list"></ul>
     </div>
-    
-    <div class="artist-container" id="artistList">
-      {{range .}}
-        <div class="artist-card">
-          <a href="/artist/{{.Name | replaceSpaces}}">
-            <img src="{{.Image}}" alt="{{.Name}}" class="artist-img" />
-            <h3>{{.Name}}</h3>
-          </a>
-        </div>
-      {{end}}
-    </div>
   
-    <!-- ✅ Load More button goes here -->
-    <div style="text-align: center; margin: 20px;">
-      <button id="loadMoreBtn" class="interactive-btn">Load More</button>
-    </div>
+    <div class="artist-container" id="artistList"></div>
+  
+    <div class="pagination-container" id="pagination"></div>
+  
+    <button id="backToTopBtn" class="back-to-top">↑ Back to Top</button>
   </main>
   
   <footer>
     <p>&copy; 2025 Groupie Tracker 🖤 Zone01 </p>
   </footer>
 
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.js" defer></script>
+  <script src="/static/js/search.js" defer></script>
+  <script src="/static/js/index.js" defer></script>
+  
 </body>
 </html>

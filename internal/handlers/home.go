@@ -11,31 +11,8 @@ import (
 	"strings"
 )
 
-func IndexPageHandler(tpl *template.Template) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if len(data.AllArtists) == 0 {
-			log.Println("ERROR: No artist data available")
-			http.Error(w, "No artist data available", http.StatusInternalServerError)
-			return
-		}
-
-		sortedArtists := make([]data.Artist, len(data.AllArtists))
-		copy(sortedArtists, data.AllArtists)
-
-		sort.Slice(sortedArtists, func(i, j int) bool {
-			return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
-		})
-
-		err := tpl.ExecuteTemplate(w, "home.html", sortedArtists)
-		if err != nil {
-			log.Println("ERROR rendering template:", err)
-			http.Error(w, "Internal Server Error while rendering homepage", http.StatusInternalServerError)
-		}
-	}
-}
-
-// HomeHandler handles the "/" route and renders the home page.
-func HomeHandler(tpl *template.Template) http.HandlerFunc {
+// IntroHandler handles the "/" route and renders the intro page.
+func IntroHandler(tpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -43,6 +20,27 @@ func HomeHandler(tpl *template.Template) http.HandlerFunc {
 		}
 
 		if r.URL.Path != "/" {
+			handler404(tpl, w)
+			return
+		}
+
+		err := tpl.ExecuteTemplate(w, "intro.html", nil)
+		if err != nil {
+			log.Println("ERROR rendering template:", err)
+			http.Error(w, "Internal Server Error while rendering index", http.StatusInternalServerError)
+		}
+	}
+}
+
+// HomeHandler handles the "/home" route and renders the home page.
+func HomeHandler(tpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if r.URL.Path != "/home" {
 			handler404(tpl, w)
 			return
 		}

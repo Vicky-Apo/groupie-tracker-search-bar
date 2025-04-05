@@ -11,12 +11,11 @@ import (
 func NewRouter(tpl *template.Template) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// First welcome page route with exact path checking.
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/index.html")
-	})
+	// First welcome page route
+	mux.HandleFunc("/", handlers.IntroHandler(tpl))
 
-	mux.HandleFunc("/home", handlers.IndexPageHandler(tpl))
+	// HomePage route
+	mux.HandleFunc("/home", handlers.HomeHandler(tpl))
 
 	// Artist detail route.
 	mux.HandleFunc("/artist/", handlers.DetailHandler(tpl))

@@ -3,12 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"groupie-tracker/internal/data"
+	"groupie-tracker/internal/utils"
 	"html/template"
 	"log"
 	"net/http"
-	"sort"
 	"strconv"
-	"strings"
 )
 
 // IntroHandler handles the "/" route and renders the intro page.
@@ -51,14 +50,7 @@ func HomeHandler(tpl *template.Template) http.HandlerFunc {
 			return
 		}
 
-		// Sort artists by name, case insensitive.
-		sortedArtists := make([]data.Artist, len(data.AllArtists))
-		copy(sortedArtists, data.AllArtists)
-		sort.Slice(sortedArtists, func(i, j int) bool {
-			return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
-		})
-
-		err := tpl.ExecuteTemplate(w, "home.html", sortedArtists)
+		err := tpl.ExecuteTemplate(w, "home.html", nil)
 		if err != nil {
 			log.Println("ERROR rendering template:", err)
 			http.Error(w, "Internal Server Error while rendering index", http.StatusInternalServerError)
@@ -85,11 +77,7 @@ func GetArtists(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Sort artists by name, case insensitive.
-	sortedArtists := make([]data.Artist, len(data.AllArtists))
-	copy(sortedArtists, data.AllArtists)
-	sort.Slice(sortedArtists, func(i, j int) bool {
-		return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
-	})
+	sortedArtists := utils.SortingArtists(data.AllArtists)
 
 	// Default values.
 	offset := 0

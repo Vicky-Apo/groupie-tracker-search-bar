@@ -11,7 +11,7 @@ var knownAbbreviations = map[string]bool{
 
 func FormatLocation(s string) string {
 	// Replace dashes and underscores with spaces
-	s = strings.ReplaceAll(s, "-", " ")
+	s = strings.ReplaceAll(s, "-", ", ")
 	s = strings.ReplaceAll(s, "_", " ")
 
 	words := strings.Fields(s)

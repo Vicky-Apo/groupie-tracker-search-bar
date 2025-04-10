@@ -23,6 +23,12 @@ func NewRouter(tpl *template.Template) *http.ServeMux {
 	// API Route for fetching artists
 	mux.HandleFunc("/api/artists", handlers.GetArtists)
 
+	// API Route for fetching all locations for filters
+	mux.HandleFunc("/api/all-locations", handlers.GetAllLocations)
+
+	// API Route for fetching filtered results
+	mux.HandleFunc("/api/filters", handlers.FiltersResultHandler())
+
 	//Search handler
 	mux.HandleFunc("/search", handlers.SearchHandler)
 

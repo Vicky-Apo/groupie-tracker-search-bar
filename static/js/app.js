@@ -34,6 +34,9 @@ function displayArtists(artists) {
   artists.forEach((artist) => {
     const card = document.createElement("div");
     card.className = "artist-card";
+    //˅˅˅--------------->>>>>> NEW: makes this card searchable! <<<<<<<<<----------˅˅˅
+    card.setAttribute("data-artist-id", artist.id);
+    //^^^--------------->>>>>> NEW: makes this card searchable! <<<<<<<<<----------^^^
     card.innerHTML = `
     <a href="/artist/${artist.name.replace(/\s+/g, "-")}" onclick="localStorage.setItem('currentPage', ${currentPage})">
       <img src="${artist.image}" alt="${artist.name}" class="artist-img" />

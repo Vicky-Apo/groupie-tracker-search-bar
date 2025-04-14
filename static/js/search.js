@@ -5,6 +5,35 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentSuggestions = [];
   
     if (!searchInput || !suggestionsBox) return;
+//------------------------------------------------------------------------------------------------
+    //          ˅˅˅ ---> ---> Handle Enter key to filter artist cards on the homepage <--- <--- ˅˅˅
+    searchInput.addEventListener("keydown", async (e) => {
+        if (e.key === "Enter") {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) return;
+
+            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            const matchedIDs = new Set(results.map(r => r.ID));
+
+            document.querySelectorAll(".artist-card").forEach(card => {
+                const cardID = parseInt(card.dataset.artistId);
+                if (matchedIDs.has(cardID)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            // Also hide suggestions on Enter
+            suggestionsBox.innerHTML = "";
+            currentSuggestions = [];
+            activeSuggestionIndex = -1;
+        }
+    });
+    //         ^^^ ---> ---> Handle Enter key to filter artist cards on the homepage <--- <--- ^^^
+//------------------------------------------------------------------------------------------------
+
   
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.trim().toLowerCase();

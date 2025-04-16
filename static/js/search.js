@@ -5,35 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentSuggestions = [];
   
     if (!searchInput || !suggestionsBox) return;
-//------------------------------------------------------------------------------------------------
-    //          ˅˅˅ ---> ---> Handle Enter key to filter artist cards on the homepage <--- <--- ˅˅˅
-    searchInput.addEventListener("keydown", async (e) => {
-        if (e.key === "Enter") {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) return;
-
-            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
-            const results = await response.json();
-            const matchedIDs = new Set(results.map(r => r.ID));
-
-            document.querySelectorAll(".artist-card").forEach(card => {
-                const cardID = parseInt(card.dataset.artistId);
-                if (matchedIDs.has(cardID)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-
-            // Also hide suggestions on Enter
-            suggestionsBox.innerHTML = "";
-            currentSuggestions = [];
-            activeSuggestionIndex = -1;
-        }
-    });
-    //         ^^^ ---> ---> Handle Enter key to filter artist cards on the homepage <--- <--- ^^^
-//------------------------------------------------------------------------------------------------
-
   
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.trim().toLowerCase();
@@ -67,9 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
             li.setAttribute("data-index", index);
   
             li.onclick = () => {
-              window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+              if (result.Type === "artist/band" || result.Type === "member") {
+                window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+              } else {
+                // Use the part before the " — " as the query.
+                const queryParam = result.Value.split(" — ")[0];
+                window.location.href = `/results?query=${encodeURIComponent(queryParam)}`;
+              }
             };
-  
             suggestionsBox.appendChild(li);
           });
         });
@@ -91,11 +67,23 @@ document.addEventListener("DOMContentLoaded", () => {
         updateActiveSuggestion(items);
       }
   
-      if (e.key === "Enter" && activeSuggestionIndex !== -1) {
+      if (e.key === "Enter") {
         e.preventDefault();
-        const result = currentSuggestions[activeSuggestionIndex];
-        if (result) {
-          window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+        if (activeSuggestionIndex !== -1) {
+          const result = currentSuggestions[activeSuggestionIndex];
+          if (result) {
+            if (result.Type === "artist/band" || result.Type === "member") {
+              window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+            } else {
+              const queryParam = result.Value.split(" — ")[0];
+              window.location.href = `/results?query=${encodeURIComponent(queryParam)}`;
+            }
+          }
+        } else {
+          const query = searchInput.value.trim();
+          if (query !== "") {
+            window.location.href = `/results?query=${encodeURIComponent(query)}`;
+          }
         }
       }
     });
